@@ -18,27 +18,34 @@ import jeu.astar.Node;
 public class MonJoueur extends jeu.Joueur {
 	double distanceMin=20;
 	Point plusProche=new Point();
+	
+	public static int tailleMap = 100;
+	public static boolean init = false;
+	
 	public MonJoueur(String nom) {super(nom);}
     
 	
 	
     @Override
     public Action faitUneAction(Plateau etatDuJeu) {
+        System.out.println(getListeYourtes(etatDuJeu).toString());
+     
+        System.out.println(getNbChamps(etatDuJeu));
         
     	return Action.BAS;
     }
 
-    public static Joueur.Action donneDirection(Point depart, Point arrivée) {
-    	if(depart.getX() < arrivée.getX()) {
+    public static Joueur.Action donneDirection(Point depart, Point arrivee) {
+    	if(depart.getX() < arrivee.getX()) {
     		return Joueur.Action.DROITE;
     	}
-    	if(depart.getX() > arrivée.getX()) {
+    	if(depart.getX() > arrivee.getX()) {
     		return Joueur.Action.GAUCHE;
     	}
-    	if(depart.getY() < arrivée.getY()) {
+    	if(depart.getY() < arrivee.getY()) {
     		return Joueur.Action.BAS;
     	}
-    	if(depart.getY() > arrivée.getY()) {
+    	if(depart.getY() > arrivee.getY()) {
     		return Joueur.Action.HAUT;
     	}
     	
@@ -63,9 +70,37 @@ public class MonJoueur extends jeu.Joueur {
     	return plusProche;
     }
     
-    public double calculDistance(Point poin ,Point posActu,Plateau plateau) {
+    public static double calculDistance(Point poin ,Point posActu,Plateau plateau) {
     	ArrayList<Node> monArray=plateau.donneCheminEntre(posActu,poin);
 		return monArray.size();
     
     }
+    
+    public static ArrayList<Point> getListeYourtes(Plateau plateau) {
+    	return plateau.cherche(new Point(5,5), 100, Plateau.CHERCHE_YOURTE).get(1);
+    }
+    
+    public static ArrayList<Point> getChampsProches(Plateau plateau, Point point){
+    	ArrayList<Point> premiereListe =  plateau.cherche(point, 5,Plateau.CHERCHE_CHAMP).get(2);
+    	System.out.println("Premiere Liste " + premiereListe.toString());
+    	ArrayList<Point> listeFinale = new ArrayList<Point>();
+    	premiereListe.forEach(
+    			(champ)->{
+    				if(calculDistance(point, champ, plateau) <= 10) {
+    					listeFinale.add(champ);
+    				}
+    	});
+    	return listeFinale;
+    }
+    
+   
+   
+    public static ArrayList<Point> getAllChamps(Plateau plateau){
+    	return plateau.cherche(new Point(0,0), tailleMap, Plateau.CHERCHE_CHAMP).get(2);
+    }
+    
+    public static int getNbChamps(Plateau plateau) {
+    	return getAllChamps(plateau).size() / 4;
+    }
+   
 }

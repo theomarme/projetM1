@@ -10,6 +10,7 @@ import gui.FenetreDeJeuFK;
 import java.awt.Point;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import jeu.Joueur;
@@ -28,13 +29,14 @@ public class AreneSolo {
             "|  ##  ######    |\n"+
             "+----------------+";
     
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         //Plateau p = new Plateau( 1200, PLATEAU_FK_PETIT);
         Plateau p = new Plateau( 1200, MaitreDuJeuFK.PLATEAU_FK_DEFAUT);
         MaitreDuJeuFK jeu = new MaitreDuJeuFK(p);
         jeu.metJoueurEnPosition(0, new MonJoueur("Moi"));
         FenetreDeJeuFK f = new FenetreDeJeuFK(jeu, true, true);
-        f.log = new java.io.File("./tmp/toto.log");
+        f.log = new java.io.File("./project.log");
+        f.log.createNewFile();
         
         f.addWindowListener( new WindowListener() {
             @Override

@@ -28,23 +28,23 @@ public class MonJoueur extends jeu.Joueur {
     	return Action.BAS;
     }
 
-    public static Joueur.Action donneDirection(Point depart, Point arrivÃ©e) {
-    	if(depart.getX() < arrivÃ©e.getX()) {
+    public static Joueur.Action donneDirection(Point depart, Point arrivée) {
+    	if(depart.getX() < arrivée.getX()) {
     		return Joueur.Action.DROITE;
     	}
-    	if(depart.getX() > arrivÃ©e.getX()) {
+    	if(depart.getX() > arrivée.getX()) {
     		return Joueur.Action.GAUCHE;
     	}
-    	if(depart.getY() < arrivÃ©e.getY()) {
+    	if(depart.getY() < arrivée.getY()) {
     		return Joueur.Action.BAS;
     	}
-    	if(depart.getY() > arrivÃ©e.getY()) {
+    	if(depart.getY() > arrivée.getY()) {
     		return Joueur.Action.HAUT;
     	}
     	
     	return null;
     }
-    public Point cherchePlusCourt(HashMap<java.lang.Integer,java.util.ArrayList<java.awt.Point>> listRecherche) {
+    public Point cherchePlusCourt(HashMap<java.lang.Integer,java.util.ArrayList<java.awt.Point>> listRecherche,Plateau plateau) {
     	Point maPos=this.donnePosition();
     	distanceMin=20;
     	
@@ -52,7 +52,7 @@ public class MonJoueur extends jeu.Joueur {
     	   
     	    ArrayList<Point> value = entry.getValue();
     	    value.forEach((n)->{
-    	    	double distance=calculDistance(n,maPos);
+    	    	double distance=calculDistance(n,maPos,plateau);
     	    	if(distance<distanceMin) {
     	    		distanceMin=distance;
     	    		plusProche=n;
@@ -63,11 +63,9 @@ public class MonJoueur extends jeu.Joueur {
     	return plusProche;
     }
     
-    public double calculDistance(Point poin ,Point posActu) {
-    	double x=Math.abs(posActu.getX())-Math.abs(poin.getX());
-    	double y=Math.abs(posActu.getY())-Math.abs(poin.getY());
-    	double dist=Math.abs(x)+Math.abs(y);
-		return dist;
+    public double calculDistance(Point poin ,Point posActu,Plateau plateau) {
+    	ArrayList<Node> monArray=plateau.donneCheminEntre(posActu,poin);
+		return monArray.size();
     
     }
 }

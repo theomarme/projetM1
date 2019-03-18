@@ -32,6 +32,9 @@ public class MonJoueur extends jeu.Joueur {
      
         System.out.println(getNbChamps(etatDuJeu));
         
+    	Point maPos=this.donnePosition();
+    	cherchePlusCourt(etatDuJeu.cherche(maPos, 10,Plateau.CHERCHE_CHAMP),etatDuJeu);
+    	
     	return Action.BAS;
     }
 
@@ -51,22 +54,37 @@ public class MonJoueur extends jeu.Joueur {
     	
     	return null;
     }
+    
+    public java.util.ArrayList<java.awt.Point> ListeChampCoteYourte(Point posYourt,int rayon,Plateau plateau,int nbMinChamps){
+    	HashMap<Integer, ArrayList<Point>> ListChamps=plateau.cherche(posYourt, rayon, Plateau.CHERCHE_CHAMP);
+    	
+    	if(ListChamps.get(2).size()<nbMinChamps) {
+    		
+    		ListeChampCoteYourte(posYourt,rayon+1,plateau,nbMinChamps);
+    	}
+    	return ListChamps.get(2);
+    	
+    }
+    
     public Point cherchePlusCourt(HashMap<java.lang.Integer,java.util.ArrayList<java.awt.Point>> listRecherche,Plateau plateau) {
     	Point maPos=this.donnePosition();
-    	distanceMin=20;
+    	distanceMin=10;
+    	int numMoi=plateau.donneJoueurCourant();
     	
     	for(Map.Entry<java.lang.Integer,java.util.ArrayList<java.awt.Point>> entry : listRecherche.entrySet()) {
     	   
     	    ArrayList<Point> value = entry.getValue();
     	    value.forEach((n)->{
-    	    	double distance=calculDistance(n,maPos,plateau);
-    	    	if(distance<distanceMin) {
-    	    		distanceMin=distance;
-    	    		plusProche=n;
+    	    	if(Plateau.donneProprietaireDuSite(plateau.donneContenuCellule(n))!= numMoi+1) {
+    	    		double distance=calculDistance(n,maPos,plateau);
+	    	    	if(distance<distanceMin) {
+		    	    	distanceMin=distance;
+		    	    	plusProche=n;
+		    	    }
     	    	}
-    	    });  
+
+    	    });
     	}
-    	
     	return plusProche;
     }
     

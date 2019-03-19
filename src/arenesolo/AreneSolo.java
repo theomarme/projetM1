@@ -30,8 +30,8 @@ public class AreneSolo {
             "+----------------+";
     
     public static void main(String[] args) throws IOException {
-        //Plateau p = new Plateau( 1200, PLATEAU_FK_PETIT);
-        Plateau p = new Plateau( 1200, MaitreDuJeuFK.PLATEAU_FK_DEFAUT);
+        Plateau p = new Plateau( 1200, PLATEAU_FK_PETIT);
+//        Plateau p = new Plateau( 1200, MaitreDuJeuFK.PLATEAU_FK_DEFAUT);
         MaitreDuJeuFK jeu = new MaitreDuJeuFK(p);
         jeu.metJoueurEnPosition(0, new MonJoueur("Moi"));
         jeu.metJoueurEnPosition(1 ,  new MonJoueur("MoiTest"));

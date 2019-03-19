@@ -79,23 +79,25 @@ public class MonJoueur extends jeu.Joueur {
 
     
     public static Joueur.Action donneDirection(Point depart, Point arrivee) {
-    	if(depart.getX() < arrivee.getX()) {
-    		return Joueur.Action.DROITE;
+    	if((depart != null) && (arrivee != null)) {
+	    	if(depart.getX() < arrivee.getX()) {
+	    		return Joueur.Action.DROITE;
+	    	}
+	    	if(depart.getX() > arrivee.getX()) {
+	    		return Joueur.Action.GAUCHE;
+	    	}
+	    	if(depart.getY() < arrivee.getY()) {
+	    		return Joueur.Action.BAS;
+	    	}
+	    	if(depart.getY() > arrivee.getY()) {
+	    		return Joueur.Action.HAUT;
+	    	}
+	    	if((depart.getY() == arrivee.getY()) &&  (depart.getX() == depart.getX())) {
+	    		return Joueur.Action.RIEN;
+	    	}
     	}
-    	if(depart.getX() > arrivee.getX()) {
-    		return Joueur.Action.GAUCHE;
-    	}
-    	if(depart.getY() < arrivee.getY()) {
-    		return Joueur.Action.BAS;
-    	}
-    	if(depart.getY() > arrivee.getY()) {
-    		return Joueur.Action.HAUT;
-    	}
-    	if((depart.getY() == arrivee.getY()) &&  (depart.getX() == depart.getX())) {
-    		return Joueur.Action.RIEN;
-    	}
-    	
     	return null;
+  	
     }
     
     public boolean chercherJoueur(ArrayList<Node> chemin,	Plateau plateau) {

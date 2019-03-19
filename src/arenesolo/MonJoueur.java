@@ -10,6 +10,7 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -31,7 +32,6 @@ public class MonJoueur extends jeu.Joueur {
 	
 	public MonJoueur(String nom) {super(nom);}
     
-	
 	
     @Override
     public Action faitUneAction(Plateau etatDuJeu) {
@@ -73,12 +73,27 @@ public class MonJoueur extends jeu.Joueur {
     	}    	
     	
     	this.chemin = etatDuJeu.donneCheminEntre(maPos, this.dest);
+   
     	Point nextCase = (this.chemin.size() > 0 ? getPointFromNode(this.chemin.get(0)) : maPos);
     	return donneDirection(maPos, nextCase);
     }
-
+    
+    
+    public  java.util.ArrayList<java.awt.Point> verifNosChamps(ArrayList<Point> mesChamps,Plateau plateau){
+    	Iterator<Point> iter = mesChamps.iterator();
+    	ArrayList<java.awt.Point> champsPlusANous=new ArrayList<java.awt.Point>();
+    	while(iter.hasNext()) {
+    		Point current =iter.next();
+    		boolean res=isMine(plateau.donneContenuCellule(current),plateau);
+    		if(res==false) {
+    			champsPlusANous.add(current);
+    		}
+    	}
+    	return champsPlusANous;
+    }
     
     public static Joueur.Action donneDirection(Point depart, Point arrivee) {
+  
     	if((depart != null) && (arrivee != null)) {
 	    	if(depart.getX() < arrivee.getX()) {
 	    		return Joueur.Action.DROITE;
@@ -96,6 +111,7 @@ public class MonJoueur extends jeu.Joueur {
 	    		return Joueur.Action.RIEN;
 	    	}
     	}
+    	
     	return null;
   	
     }
@@ -135,10 +151,16 @@ public class MonJoueur extends jeu.Joueur {
     		ListChamps = plateau.cherche(posYourt, rayon, Plateau.CHERCHE_CHAMP);
     		rayon ++;
     	}
-    	
- 
     	return ListChamps.get(2);
     	
+    }
+    
+    public Point getChampsPasAMoi(Plateau plateau,ArrayList<Point> mesChamps) {
+    	Point maPos=this.donnePosition();
+    	ArrayList<Point> champs=getAllChamps(plateau);
+    	champs.removeIf(poin ->(mesChamps).contains(poin));
+    	
+    	return pointPlusProche(champs,maPos,plateau);
     }
     
     public Point cherchePlusCourt(HashMap<java.lang.Integer,java.util.ArrayList<java.awt.Point>> listRecherche,Plateau plateau) {
@@ -195,7 +217,7 @@ public class MonJoueur extends jeu.Joueur {
     	return getAllChamps(plateau).size() / 4;
     }
     public boolean isMine(int cellule, Plateau plateau) {
-    	
+    
     	return (Plateau.donneProprietaireDuSite(cellule) == plateau.donneJoueurCourant()+1);
     }
     

@@ -14,7 +14,7 @@ public class MonJoueur extends jeu.Joueur {
 	double distanceMin = 20;
 	Point plusProche = new Point();
 
-	public static int tailleMap = 100;
+	public static int tailleMap = 0;
 	public boolean init = false;
 	public Point maYourte;
 	public int nbChamps;
@@ -34,6 +34,7 @@ public class MonJoueur extends jeu.Joueur {
 			this.dest = maPos;
 		}
 		if (this.init == false) {
+			this.tailleMap=etatDuJeu.donneTaille();
 			this.maYourte = cherchePlusCourt(etatDuJeu.cherche(maPos, 10, Plateau.CHERCHE_YOURTE), etatDuJeu);
 			this.nbChamps = getNbChamps(etatDuJeu);
 			this.mesChamps = ListeChampCoteYourte(this.maYourte, 1, etatDuJeu, this.nbChamps);
@@ -44,6 +45,7 @@ public class MonJoueur extends jeu.Joueur {
 			this.dest = maPos;
 		}
 		else {
+			
 			ArrayList<Point> champsLibres = (ArrayList<Point>) this.mesChamps
 					.stream().filter(champ -> !this
 							.isMine(etatDuJeu.donneContenuCellule((int) champ.getX(), (int) champ.getY()), etatDuJeu))
@@ -52,9 +54,11 @@ public class MonJoueur extends jeu.Joueur {
 				this.dest = pointPlusProche(champsLibres, maPos, etatDuJeu);
 				if (!(this.donneVigueur() > 20 + calculDistance(this.dest, maPos, etatDuJeu))) {
 					if (isJoueurOnYourte(this.maYourte, etatDuJeu)) {
+						System.out.println("1");
 						this.dest = maPos;
 					}
 					else {
+						System.out.println("2");
 						this.dest = this.maYourte;
 					}
 				}	
@@ -63,19 +67,45 @@ public class MonJoueur extends jeu.Joueur {
 				this.dest = this.getChampsPasAMoi(etatDuJeu, this.mesChamps);
 				if (!(this.donneVigueur() > 20 + calculDistance(this.dest, maPos, etatDuJeu))) {
 					if (isJoueurOnYourte(this.maYourte, etatDuJeu)) {
+						System.out.println("3");
 						this.dest = maPos;
 					}
 					else {
+						System.out.println("4");
 						this.dest = this.maYourte;
 					}
 				}
 			}
+			if(this.dest==maPos && maPos.getX()==this.maYourte.getX() && maPos.getY()==this.maYourte.getY()) {
+				System.out.println("5");
+				this.dest=vaSurCaseVide(maPos,etatDuJeu);
+			}
 			
 		}
+		//System.out.println("destination :"+this.dest);
+		//System.out.println(" yourte :"+this.maYourte);
 		this.chemin = etatDuJeu.donneCheminAvecObstaclesSupplementaires(maPos, this.dest, getJoueurs(etatDuJeu));
 
 		Point nextCase = (this.chemin.size() > 0 ? getPointFromNode(this.chemin.get(0)) : maPos);
 		return donneDirection(maPos, nextCase);
+	}
+	
+	public Point vaSurCaseVide(Point maPose,Plateau plateau) {
+		int x =(int) maPose.getX();
+		int y =(int) maPose.getY();
+		if(plateau.joueurPeutAllerIci(x+1, y, true, true)==true) {
+			return new Point(x+1,y);
+		}else if(plateau.joueurPeutAllerIci(x-1, y, true, true)==true) {
+			return new Point(x-1,y);
+		}else if(plateau.joueurPeutAllerIci(x, y+1, true, true)==true) {
+			return new Point(x,y+1);
+		}else if(plateau.joueurPeutAllerIci(x-1, y-1, true, true)==true) {
+			return new Point(x,y-1);
+		}else {
+			return maPose;
+		}
+		
+		
 	}
 
 	public java.util.ArrayList<java.awt.Point> verifNosChamps(ArrayList<Point> mesChamps, Plateau plateau) {
@@ -146,7 +176,6 @@ public class MonJoueur extends jeu.Joueur {
 		HashMap<Integer, ArrayList<Point>> ListChamps = plateau.cherche(posYourt, rayon, Plateau.CHERCHE_CHAMP);
 
 		while (ListChamps.get(2).size() < nbMinChamps) {
-
 			ListChamps = plateau.cherche(posYourt, rayon, Plateau.CHERCHE_CHAMP);
 			rayon++;
 		}
@@ -172,7 +201,7 @@ public class MonJoueur extends jeu.Joueur {
 
 			ArrayList<Point> points = entry.getValue();
 			points.forEach((point) -> {
-				if (Plateau.donneProprietaireDuSite(plateau.donneContenuCellule(point)) != numMoi + 1) {
+				if (Plateau.donneProprietaireDeLObjet(plateau.donneContenuCellule(point)) != numMoi + 1) {
 					double distance = calculDistance(point, maPos, plateau);
 					if (distance < distanceMin  && 
 						distance > 0 &&
@@ -224,7 +253,7 @@ public class MonJoueur extends jeu.Joueur {
 
 	public boolean isMine(int cellule, Plateau plateau) {
 
-		return (Plateau.donneProprietaireDuSite(cellule) == plateau.donneJoueurCourant() + 1);
+		return (Plateau.donneProprietaireDeLObjet(cellule) == plateau.donneJoueurCourant() + 1);
 	}
 
 	public static Point pointPlusProche(ArrayList<Point> liste, Point point, Plateau plateau) {
@@ -239,7 +268,7 @@ public class MonJoueur extends jeu.Joueur {
 				pointMin = current;
 			}
 		}
-		System.out.println("Point plus proche" + liste.toString());
+		//System.out.println("Point plus proche" + liste.toString());
 		if(pointMin == null) {
 			return point;
 		}

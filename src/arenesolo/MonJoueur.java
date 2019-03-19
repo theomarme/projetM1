@@ -22,7 +22,7 @@ public class MonJoueur extends jeu.Joueur {
 	Point plusProche=new Point();
 	
 	public static int tailleMap = 100;
-	public static boolean init = false;
+	public boolean init = false;
 	public Point maYourte;
 	public int nbChamps;
 	public ArrayList<Point> mesChamps;
@@ -40,11 +40,11 @@ public class MonJoueur extends jeu.Joueur {
     	if(this.dest == null) {
     		this.dest= maPos;
     	}
-    	if(init == false) {
+    	if(this.init == false) {
     		this.maYourte = cherchePlusCourt(etatDuJeu.cherche(maPos, 10,Plateau.CHERCHE_YOURTE),etatDuJeu);
 	    	this.nbChamps = getNbChamps(etatDuJeu);
 	    	this.mesChamps = ListeChampCoteYourte(this.maYourte, 1, etatDuJeu, this.nbChamps);
-	    	init = true;
+	    	this.init = true;
     	}
     	// Si on se trouve sur une Yourte
     	if(Plateau.contientUneYourte(etatDuJeu.donneContenuCellule(maPos)) && this.donneVigueur() < 100) {
@@ -54,11 +54,13 @@ public class MonJoueur extends jeu.Joueur {
     	else {
     		// Si on a assez de vigueur pour aller au champ
         	if(this.donneVigueur() > (20 + calculDistance(this.dest, maPos, etatDuJeu))) {
+        		
     	    	ArrayList<Point> champsLibres = (ArrayList<Point>) this.mesChamps.stream().filter(
-    	    			champ -> !isMine(etatDuJeu.donneContenuCellule((int)champ.getX(), (int)champ.getY()), etatDuJeu)).collect(Collectors.toList());
-    	    	System.out.println(this.dest);
-    	    	this.dest = pointPlusProche(champsLibres, maPos, etatDuJeu);
-    	    	this.chemin = etatDuJeu.donneCheminEntre(maPos, this.dest);
+    	    			champ -> !this.isMine(etatDuJeu.donneContenuCellule((int)champ.getX(), (int)champ.getY()), etatDuJeu)).collect(Collectors.toList());
+    	    
+    	    	if(champsLibres.size() > 0) {
+    	    		this.dest = pointPlusProche(champsLibres, maPos, etatDuJeu);
+    	    	}	
         	}
         	else {
         		if(isJoueurOnYourte(this.maYourte, etatDuJeu)){
@@ -71,7 +73,8 @@ public class MonJoueur extends jeu.Joueur {
     	}    	
     	
     	this.chemin = etatDuJeu.donneCheminEntre(maPos, this.dest);
-    	return donneDirection(maPos, getPointFromNode(this.chemin.get(0)));
+    	Point nextCase = (this.chemin.size() > 0 ? getPointFromNode(this.chemin.get(0)) : maPos);
+    	return donneDirection(maPos, nextCase);
     }
 
     
@@ -191,7 +194,7 @@ public class MonJoueur extends jeu.Joueur {
     }
     public boolean isMine(int cellule, Plateau plateau) {
     	
-    	return (Plateau.donneProprietaireDuSite(cellule) != plateau.donneJoueurCourant());
+    	return (Plateau.donneProprietaireDuSite(cellule) == plateau.donneJoueurCourant()+1);
     }
     
     public static Point pointPlusProche(ArrayList<Point> liste, Point point, Plateau plateau) {

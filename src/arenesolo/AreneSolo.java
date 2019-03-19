@@ -34,6 +34,7 @@ public class AreneSolo {
         Plateau p = new Plateau( 1200, MaitreDuJeuFK.PLATEAU_FK_DEFAUT);
         MaitreDuJeuFK jeu = new MaitreDuJeuFK(p);
         jeu.metJoueurEnPosition(0, new MonJoueur("Moi"));
+        jeu.metJoueurEnPosition(1 ,  new MonJoueur("MoiTest"));
         FenetreDeJeuFK f = new FenetreDeJeuFK(jeu, true, true);
         f.log = new java.io.File("./project.log");
         f.log.createNewFile();

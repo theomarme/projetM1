@@ -54,11 +54,10 @@ public class MonJoueur extends jeu.Joueur {
 				this.dest = pointPlusProche(champsLibres, maPos, etatDuJeu);
 				if (!(this.donneVigueur() > 20 + calculDistance(this.dest, maPos, etatDuJeu))) {
 					if (isJoueurOnYourte(this.maYourte, etatDuJeu)) {
-						System.out.println("1");
+						
 						this.dest = maPos;
 					}
 					else {
-						System.out.println("2");
 						this.dest = this.maYourte;
 					}
 				}	
@@ -67,27 +66,31 @@ public class MonJoueur extends jeu.Joueur {
 				this.dest = this.getChampsPasAMoi(etatDuJeu, this.mesChamps);
 				if (!(this.donneVigueur() > 20 + calculDistance(this.dest, maPos, etatDuJeu))) {
 					if (isJoueurOnYourte(this.maYourte, etatDuJeu)) {
-						System.out.println("3");
+						
 						this.dest = maPos;
 					}
 					else {
-						System.out.println("4");
-						this.dest = this.maYourte;
+						
+						this.dest = this.yourtePlusProche(etatDuJeu);
 					}
 				}
 			}
-			if(this.dest==maPos && maPos.getX()==this.maYourte.getX() && maPos.getY()==this.maYourte.getY()) {
-				System.out.println("5");
+			if(this.dest.getX()==maPos.getX() && this.dest.getY()==maPos.getY() && maPos.getX()==this.maYourte.getX() && maPos.getY()==this.maYourte.getY()) {
+				
 				this.dest=vaSurCaseVide(maPos,etatDuJeu);
 			}
 			
 		}
-		//System.out.println("destination :"+this.dest);
-		//System.out.println(" yourte :"+this.maYourte);
+		
 		this.chemin = etatDuJeu.donneCheminAvecObstaclesSupplementaires(maPos, this.dest, getJoueurs(etatDuJeu));
 
 		Point nextCase = (this.chemin.size() > 0 ? getPointFromNode(this.chemin.get(0)) : maPos);
 		return donneDirection(maPos, nextCase);
+	}
+	
+	public Point yourtePlusProche(Plateau plateau) {
+		return cherchePlusCourt(getListeYourtes(plateau),plateau);
+		
 	}
 	
 	public Point vaSurCaseVide(Point maPose,Plateau plateau) {

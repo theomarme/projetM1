@@ -37,26 +37,44 @@ public class MonJoueur extends jeu.Joueur {
     public Action faitUneAction(Plateau etatDuJeu) {
         
     	Point maPos=this.donnePosition();
-    	this.dest = maPos;
-    	if(this.donneVigueur() > (20 + calculDistance(this.dest, maPos, etatDuJeu))) {
-	    	this.maYourte = cherchePlusCourt(etatDuJeu.cherche(maPos, 10,Plateau.CHERCHE_YOURTE),etatDuJeu);
+    	if(this.dest == null) {
+    		this.dest= maPos;
+    	}
+    	if(init == false) {
+    		this.maYourte = cherchePlusCourt(etatDuJeu.cherche(maPos, 10,Plateau.CHERCHE_YOURTE),etatDuJeu);
 	    	this.nbChamps = getNbChamps(etatDuJeu);
 	    	this.mesChamps = ListeChampCoteYourte(this.maYourte, 1, etatDuJeu, this.nbChamps);
-	    	
-	    	ArrayList<Point> champsLibres = (ArrayList<Point>) this.mesChamps.stream().filter(
-	    			champ -> !isMine(etatDuJeu.donneContenuCellule((int)champ.getX(), (int)champ.getY()), etatDuJeu)).collect(Collectors.toList());
-	    	System.out.println(this.dest);
-	    	this.dest = pointPlusProche(champsLibres, maPos, etatDuJeu);
-	    	this.chemin = etatDuJeu.donneCheminEntre(maPos, this.dest);
+	    	init = true;
     	}
-    	else {
-    		this.dest = this.maYourte;
-    		this.chemin = etatDuJeu.donneCheminEntre(maPos, this.dest);
+    	// Si on se trouve sur une Yourte
+    	if(Plateau.contientUneYourte(etatDuJeu.donneContenuCellule(maPos)) && this.donneVigueur() < 100) {
+    		this.dest = maPos;
     	}
     	
+    	else {
+    		// Si on a assez de vigueur pour aller au champ
+        	if(this.donneVigueur() > (20 + calculDistance(this.dest, maPos, etatDuJeu))) {
+    	    	ArrayList<Point> champsLibres = (ArrayList<Point>) this.mesChamps.stream().filter(
+    	    			champ -> !isMine(etatDuJeu.donneContenuCellule((int)champ.getX(), (int)champ.getY()), etatDuJeu)).collect(Collectors.toList());
+    	    	System.out.println(this.dest);
+    	    	this.dest = pointPlusProche(champsLibres, maPos, etatDuJeu);
+    	    	this.chemin = etatDuJeu.donneCheminEntre(maPos, this.dest);
+        	}
+        	else {
+        		if(isJoueurOnYourte(this.maYourte, etatDuJeu)){
+        			this.dest = maPos;
+        		}
+        		else {
+        			this.dest = this.maYourte;
+        		}
+        	}
+    	}
+    	
+    	this.chemin = etatDuJeu.donneCheminEntre(maPos, this.dest);
     	return donneDirection(maPos, getPointFromNode(this.chemin.get(0)));
     }
 
+    
     public static Joueur.Action donneDirection(Point depart, Point arrivee) {
     	if(depart.getX() < arrivee.getX()) {
     		return Joueur.Action.DROITE;
@@ -169,6 +187,10 @@ public class MonJoueur extends jeu.Joueur {
     public static Point getPointFromNode(Node noeud) {
     	return new Point(noeud.getPosX(), noeud.getPosY());
     }
-   
+    
+    public static boolean isJoueurOnYourte(Point yourte, Plateau plateau) {
+    	return ((plateau.donneContenuCellule(yourte) & Plateau.MASQUE_PRESENCE_JOUEUR) != 0);
+    }
+    
    
 }

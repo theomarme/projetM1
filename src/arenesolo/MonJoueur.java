@@ -9,7 +9,9 @@ import jeu.Joueur;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import jeu.Joueur;
 import jeu.Plateau;
@@ -21,6 +23,11 @@ public class MonJoueur extends jeu.Joueur {
 	
 	public static int tailleMap = 100;
 	public static boolean init = false;
+	public Point maYourte;
+	public int nbChamps;
+	public ArrayList<Point> mesChamps;
+	public Point dest;
+	public ArrayList<Node> chemin;
 	
 	public MonJoueur(String nom) {super(nom);}
     
@@ -28,14 +35,26 @@ public class MonJoueur extends jeu.Joueur {
 	
     @Override
     public Action faitUneAction(Plateau etatDuJeu) {
-        System.out.println(getListeYourtes(etatDuJeu).toString());
-     
-        System.out.println(getNbChamps(etatDuJeu));
         
     	Point maPos=this.donnePosition();
-    	cherchePlusCourt(etatDuJeu.cherche(maPos, 10,Plateau.CHERCHE_CHAMP),etatDuJeu);
+    	this.dest = maPos;
+    	if(this.donneVigueur() > (20 + calculDistance(this.dest, maPos, etatDuJeu))) {
+	    	this.maYourte = cherchePlusCourt(etatDuJeu.cherche(maPos, 10,Plateau.CHERCHE_YOURTE),etatDuJeu);
+	    	this.nbChamps = getNbChamps(etatDuJeu);
+	    	this.mesChamps = ListeChampCoteYourte(this.maYourte, 1, etatDuJeu, this.nbChamps);
+	    	
+	    	ArrayList<Point> champsLibres = (ArrayList<Point>) this.mesChamps.stream().filter(
+	    			champ -> !isMine(etatDuJeu.donneContenuCellule((int)champ.getX(), (int)champ.getY()), etatDuJeu)).collect(Collectors.toList());
+	    	System.out.println(this.dest);
+	    	this.dest = pointPlusProche(champsLibres, maPos, etatDuJeu);
+	    	this.chemin = etatDuJeu.donneCheminEntre(maPos, this.dest);
+    	}
+    	else {
+    		this.dest = this.maYourte;
+    		this.chemin = etatDuJeu.donneCheminEntre(maPos, this.dest);
+    	}
     	
-    	return Action.BAS;
+    	return donneDirection(maPos, getPointFromNode(this.chemin.get(0)));
     }
 
     public static Joueur.Action donneDirection(Point depart, Point arrivee) {
@@ -51,17 +70,24 @@ public class MonJoueur extends jeu.Joueur {
     	if(depart.getY() > arrivee.getY()) {
     		return Joueur.Action.HAUT;
     	}
+    	if((depart.getY() == arrivee.getY()) &&  (depart.getX() == depart.getX())) {
+    		return Joueur.Action.RIEN;
+    	}
     	
     	return null;
     }
     
-    public java.util.ArrayList<java.awt.Point> ListeChampCoteYourte(Point posYourt,int rayon,Plateau plateau,int nbMinChamps){
-    	HashMap<Integer, ArrayList<Point>> ListChamps=plateau.cherche(posYourt, rayon, Plateau.CHERCHE_CHAMP);
+    public static java.util.ArrayList<java.awt.Point> ListeChampCoteYourte(Point posYourt,int rayon,Plateau plateau,int nbMinChamps){
+    	rayon = rayon;
+    	HashMap<Integer, ArrayList<Point>> ListChamps = plateau.cherche(posYourt, rayon, Plateau.CHERCHE_CHAMP);
     	
-    	if(ListChamps.get(2).size()<nbMinChamps) {
-    		
-    		ListeChampCoteYourte(posYourt,rayon+1,plateau,nbMinChamps);
+    	while(ListChamps.get(2).size()<nbMinChamps) {
+  
+    		ListChamps = plateau.cherche(posYourt, rayon, Plateau.CHERCHE_CHAMP);
+    		rayon ++;
     	}
+    	
+ 
     	return ListChamps.get(2);
     	
     }
@@ -120,5 +146,29 @@ public class MonJoueur extends jeu.Joueur {
     public static int getNbChamps(Plateau plateau) {
     	return getAllChamps(plateau).size() / 4;
     }
+    public boolean isMine(int cellule, Plateau plateau) {
+    	
+    	return (Plateau.donneProprietaireDuSite(cellule) != plateau.donneJoueurCourant());
+    }
+    
+    public static Point pointPlusProche(ArrayList<Point> liste, Point point, Plateau plateau) {
+    	Iterator<Point> iter = liste.iterator();
+    	double min = tailleMap;
+    	Point pointMin = null;
+    	while(iter.hasNext()) {
+    		Point current = iter.next();
+    		double dist = calculDistance(current, point, plateau);
+    		if(dist < min) {
+    			min = dist;
+    			pointMin = current;
+    		}
+    	}
+    	return pointMin;
+    }
+    
+    public static Point getPointFromNode(Node noeud) {
+    	return new Point(noeud.getPosX(), noeud.getPosY());
+    }
+   
    
 }

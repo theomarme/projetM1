@@ -68,7 +68,7 @@ public class MonJoueur extends jeu.Joueur {
         			this.dest = this.maYourte;
         		}
         	}
-    	}
+    	}    	
     	
     	this.chemin = etatDuJeu.donneCheminEntre(maPos, this.dest);
     	return donneDirection(maPos, getPointFromNode(this.chemin.get(0)));
@@ -94,6 +94,32 @@ public class MonJoueur extends jeu.Joueur {
     	
     	return null;
     }
+    
+    public boolean chercherJoueur(ArrayList<Node> chemin,	Plateau plateau) {
+    	int taille = chemin.size();
+    	int enemie=0;
+    	Point maPos=this.donnePosition();
+    	Iterator<Node> iter = chemin.iterator();
+    	while(iter.hasNext()) {
+    		Point current = getPointFromNode(iter.next());
+    		HashMap<Integer, ArrayList<Point>> ListJoueur=plateau.cherche(current, 1, Plateau.CHERCHE_JOUEUR);
+    		if(ListJoueur.get(4).size()!=0) {
+    			Iterator<Point> iter2 = ListJoueur.get(4).iterator();
+    			while(iter2.hasNext()) {
+    				Point current2 = iter2.next();
+    				if(current2.getX()!=maPos.getX() && current2.getY()!=maPos.getY()) {	
+	    				enemie++;
+	    			}
+    			}
+    		}
+    	}
+    	if(enemie!=0) {
+    		return true;
+    	}else {
+    		return false;
+    	}
+    }
+    
     
     public static java.util.ArrayList<java.awt.Point> ListeChampCoteYourte(Point posYourt,int rayon,Plateau plateau,int nbMinChamps){
     	rayon = rayon;
@@ -126,7 +152,6 @@ public class MonJoueur extends jeu.Joueur {
 		    	    	plusProche=n;
 		    	    }
     	    	}
-
     	    });
     	}
     	return plusProche;

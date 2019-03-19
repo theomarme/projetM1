@@ -35,7 +35,7 @@ public class MonJoueur extends jeu.Joueur {
 		}
 		if (this.init == false) {
 			this.tailleMap=etatDuJeu.donneTaille();
-			this.maYourte = cherchePlusCourt(etatDuJeu.cherche(maPos, 10, Plateau.CHERCHE_YOURTE), etatDuJeu);
+			this.maYourte = cherchePlusCourt(getListeYourtes(etatDuJeu),etatDuJeu);
 			this.nbChamps = getNbChamps(etatDuJeu);
 			this.mesChamps = ListeChampCoteYourte(this.maYourte, 1, etatDuJeu, this.nbChamps);
 			this.init = true;
@@ -227,8 +227,8 @@ public class MonJoueur extends jeu.Joueur {
 
 	}
 
-	public static ArrayList<Point> getListeYourtes(Plateau plateau) {
-		return plateau.cherche(new Point(5, 5), tailleMap, Plateau.CHERCHE_YOURTE).get(1);
+	public static HashMap<Integer, ArrayList<Point>> getListeYourtes(Plateau plateau) {
+		return plateau.cherche(new Point(5, 5), tailleMap, Plateau.CHERCHE_YOURTE);
 	}
 
 	public static ArrayList<Point> getChampsProches(Plateau plateau, Point point) {
